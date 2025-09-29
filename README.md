@@ -32,46 +32,69 @@ Program dibuat menggunakan **Java** dengan konsep:
 
 ## 🏗️ Penjelasan Class  
 
-### 1. `main/Main.java`  
+1. `main/Main.java`  
 - Berisi **entry point** (`public static void main`).  
 - Menyediakan menu utama untuk user agar bisa mengakses fitur CRUD jadwal.  
 
-### 2. `model/JadwalPenerbangan.java`  
-- **Superclass (kelas induk)** untuk semua jenis jadwal.  
-- Memiliki atribut umum:  
-  - `id` → identitas jadwal  
-  - `nama` → nama kendaraan (roket/satelit)  
-  - `tujuan` → tujuan misi  
-  - `tanggal` → tanggal peluncuran  
-  - `status` → status misi  
+2. `model/JadwalPenerbangan.java`  
+- **Abstract class (kelas induk)** untuk semua jenis jadwal.  
+- Memiliki atribut umum: `id`, `nama`, `tujuan`, `tanggal`, `status`.  
 - Dilengkapi dengan **getter dan setter** (encapsulation).  
-- Memiliki method `tampilkanInfo()` yang akan dioverride oleh subclass.  
+- Memiliki **abstract method** `tampilkanInfo()` yang wajib dioverride oleh subclass.  
 
-### 3. `model/JadwalRoket.java`  
-- **Subclass** dari `JadwalPenerbangan`.  
+3. `model/Deskripsi.java`  
+- Sebuah **interface**.  
+- Berisi method abstrak `tampilkanDeskripsi()`.  
+- Diimplementasikan oleh class `JadwalRoket` dan `JadwalSatelit`.  
+
+4. `model/JadwalRoket.java`  
+- **Subclass** dari `JadwalPenerbangan`, sekaligus **mengimplementasi interface Deskripsi**.  
 - Menambahkan atribut khusus roket yaitu `bahanBakar`.  
-- Melakukan **overriding** pada method `tampilkanInfo()` agar menampilkan informasi roket lebih lengkap.  
+- Melakukan **overriding** pada `tampilkanInfo()`.  
+- Mengimplementasikan `tampilkanDeskripsi()`.  
 
-### 4. `model/JadwalSatelit.java`  
-- **Subclass** dari `JadwalPenerbangan`.  
+5. `model/JadwalSatelit.java`  
+- **Subclass** dari `JadwalPenerbangan`, sekaligus **mengimplementasi interface Deskripsi**.  
 - Menambahkan atribut khusus satelit yaitu `jenisSatelit`.  
-- Melakukan **overriding** pada method `tampilkanInfo()` agar menampilkan informasi satelit secara detail.  
+- Melakukan **overriding** pada `tampilkanInfo()`.  
+- Mengimplementasikan `tampilkanDeskripsi()`.  
 
-### 5. `service/JadwalService.java`  
+6. `service/JadwalService.java`  
 - Menangani **CRUD (Create, Read, Update, Delete)** data jadwal.  
-- Fitur yang tersedia:  
-  - `tambahJadwal()` → menambah jadwal baru (pilih Roket atau Satelit).  
-  - `lihatJadwal()` → menampilkan seluruh daftar jadwal.  
-  - `updateJadwal()` → memperbarui data berdasarkan ID.  
-  - `hapusJadwal()` → menghapus jadwal tertentu.  
-  - `cariJadwal()` → mencari jadwal berdasarkan nama.  
-- Menggunakan **polymorphism** karena setiap objek (`Roket` / `Satelit`) punya cara menampilkan data masing-masing.  
+- Fitur yang tersedia: `tambahJadwal()`, `lihatJadwal()`, `updateJadwal()`, `hapusJadwal()`, dan `cariJadwal()`.  
+- **Polymorphism overloading**: terdapat 2 method `cariJadwal()`  
+  - `cariJadwal(String nama)`  
+  - `cariJadwal(int id)`  
+- **Polymorphism overriding**: pemanggilan `tampilkanInfo()` akan menyesuaikan apakah objek berupa `Roket` atau `Satelit`.  
 
 ---
 
-## 🔹 Override
-Pada program ini, konsep Override digunakan pada method tampilkanInfo().
-Di dalam superclass JadwalPenerbangan, method ini hanya menampilkan data umum seperti ID, Nama, Tujuan, Tanggal, dan Status.
+## 🔹 Abstraction
+Penerapan **Abstraction** pada program ini ada pada:  
+1. `JadwalPenerbangan` → **abstract class** yang tidak dapat diinstansiasi langsung.  
+   - Method abstrak `tampilkanInfo()` dipaksa untuk diimplementasikan oleh subclass.  
+2. `Deskripsi` → **interface** yang berisi method `tampilkanDeskripsi()`.  
+   - Diimplementasikan oleh `JadwalRoket` dan `JadwalSatelit`.  
+
+Dengan abstraction, class turunan wajib melengkapi fungsi tertentu sesuai blueprint, sehingga program lebih terstruktur.
+
+---
+
+## 🔹 Polymorphism
+
+### **1. Overriding**  
+Terjadi pada method `tampilkanInfo()` di class `JadwalRoket` dan `JadwalSatelit`.  
+Contoh:  
+
+```java
+// JadwalRoket
+@Override
+public void tampilkanInfo() {
+    System.out.println("[ROKET] " + getId() + " | " + getNama() + " | " + getTujuan() +
+            " | " + getTanggal() + " | " + getStatus() + " | Bahan Bakar: " + bahanBakar);
+}
+```
+---
 
 Namun pada subclass, method ini ditulis ulang (dioverride) agar bisa menampilkan data tambahan sesuai kebutuhan:
 - `JadwalRoket`
@@ -84,7 +107,7 @@ public void tampilkanInfo() {
 ```
 Menampilkan informasi roket dengan tambahan Jenis Bahan Bakar.
 
--`JadwalSatelit`
+- `JadwalSatelit`
 ```java
 @Override
 public void tampilkanInfo() {
@@ -96,6 +119,16 @@ Menampilkan informasi satelit dengan tambahan Jenis Satelit.
 Dengan penerapan @Override, saat program memanggil:
 ```java
 jp.tampilkanInfo();
+```
+
+### 2.Overloading
+Terjadi pada method cariJadwal() di JadwalService.
+```java
+// Cari berdasarkan nama
+public void cariJadwal(String nama) { ... }
+
+// Cari berdasarkan ID
+public void cariJadwal(int id) { ... }
 ```
 
 ---
